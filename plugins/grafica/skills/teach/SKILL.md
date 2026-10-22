@@ -1,8 +1,8 @@
 ---
 name: teach
 description: "Salva a identidade de marca (nome, logo, cores com contraste aprovado, fontes, contatos, obrigatórios) em .grafica.md para todas as peças impressas do plugin grafica. Use quando o usuário quiser cadastrar ou atualizar a marca para banners, flyers, cartões e afins."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:teach

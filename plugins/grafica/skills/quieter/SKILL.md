@@ -1,8 +1,8 @@
 ---
 name: quieter
 description: "Deixa uma peça impressa mais sóbria e elegante — menos cores, mais respiro, tipografia com contraste de estilo, foto mais calma — mantendo a leitura na distância. Use quando disserem que está gritando demais ou o contexto pede seriedade (saúde, jurídico, convite, cartão)."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:quieter

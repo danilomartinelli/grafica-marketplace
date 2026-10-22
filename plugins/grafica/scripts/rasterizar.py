@@ -28,6 +28,20 @@ CANVA_MAX_PX = 100_000_000
 CANVA_MAX_BYTES = 25 * 1024 * 1024
 
 
+
+def _fonte_rotulo(tamanho):
+    """Fonte dos rótulos da folha de daltonismo: a mesma busca de fontes do kit (sem caminho fixo)."""
+    from PIL import ImageFont
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from grafica_kit import fontes_disponiveis, _index_fonts
+        for nome in ("WorkSans-Bold", "InstrumentSans-Bold"):
+            if nome in fontes_disponiveis():
+                return ImageFont.truetype(_index_fonts()[nome], tamanho)
+    except Exception:
+        pass
+    return ImageFont.load_default()
+
 def caixas(pdf, pagina):
     pg = PdfReader(pdf).pages[pagina - 1]
     media = [float(v) for v in pg.mediabox]
@@ -130,11 +144,7 @@ def folha_daltonismo(a, trim, media, w_in):
     y = lin @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
     quadros.append(("Tons de cinza (contraste de luminância)", de_lin(np.repeat(y[..., None], 3, axis=2))))
 
-    fonte_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "fonts", "WorkSans-Bold.ttf")
-    try:
-        fonte = ImageFont.truetype(fonte_path, 22)
-    except OSError:
-        fonte = ImageFont.load_default()
+    fonte = _fonte_rotulo(22)
     cols, gap, rot = (3 if W <= H * 1.6 else 2), 16, 34
     linhas = -(-len(quadros) // cols)
     folha = Image.new("RGB", (cols * W + (cols + 1) * gap, linhas * (H + rot) + (linhas + 1) * gap), "white")

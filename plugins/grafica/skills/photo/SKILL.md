@@ -1,8 +1,8 @@
 ---
 name: photo
 description: "Coloca ou troca a foto de uma peça impressa: escolhe foto do cliente ou de banco com licença comercial livre, confere a resolução efetiva para a distância e trata com recorte, opacidade, fade-x e sombra atrás do texto. Use quando pedirem foto, imagem de fundo ou fade numa peça para imprimir."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:photo

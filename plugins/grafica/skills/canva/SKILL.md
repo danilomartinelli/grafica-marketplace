@@ -1,8 +1,8 @@
 ---
 name: canva
 description: "Sobe uma peça impressa feita com o plugin grafica para o Canva do usuário como design no tamanho real (imagem em alta resolução), com aprovação antes de salvar. Use quando pedirem para subir, levar ou salvar no Canva uma peça feita aqui."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:canva

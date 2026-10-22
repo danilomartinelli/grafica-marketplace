@@ -1,8 +1,8 @@
 ---
 name: critique
 description: "Avalia o design de uma peça impressa (banner, faixa, flyer, cartão, cartaz…) como quem passa na rua: teste dos 3 segundos, hierarquia, simulação de distância, contraste, daltonismo, marca e chamada para ação, com as 3 correções que mais rendem. Use quando pedirem opinião ou crítica sobre o design de uma peça para imprimir. Para checagem técnica de arquivo use audit; para designs abertos no Canva, as skills do Canva."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:critique [arquivo]

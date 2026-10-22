@@ -1,8 +1,8 @@
 ---
 name: craft
 description: "Cria, faz ou monta uma peça gráfica IMPRESSA nova — banner, faixa, lona de fachada, wind banner, cartaz, flyer/panfleto, folder, cartão de visita, adesivo, placa, cardápio, encarte, outdoor — no tamanho real em cm, com letra e DPI pela distância de leitura, sangria, cores da marca com contraste e acessibilidade e formato push para rua, entregando PDF vetorial (RGB ou CMYK) + imagem para a gráfica. Use sempre que pedirem para criar algo para imprimir ou pendurar na rua, loja, vitrine ou evento, mesmo sem dizer impresso. Não use para designs dentro do Canva (skills do Canva), pôster artístico (canvas-design), slides, documentos ou posts de rede social."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:craft <tipo>

@@ -1,8 +1,8 @@
 ---
 name: adapt
 description: "Adapta uma peça impressa feita com o plugin grafica para outro formato reorganizando a hierarquia (banner → flyer → cartão → cartaz → wind banner → post/story), recalculando distância, letra e DPI. Use quando pedirem a mesma peça em outro tamanho, suporte ou versão digital. Para redimensionar um design que está no Canva, use as skills do Canva."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:adapt <formato>

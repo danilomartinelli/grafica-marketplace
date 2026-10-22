@@ -1,8 +1,8 @@
 ---
 name: grill
 description: "Entrevista o pedido de uma peça impressa (banner, faixa, flyer, cartão, cartaz, placa…) antes de produzir — uma pergunta por vez, sempre com resposta recomendada, percorrendo distância, tamanho, mensagem, dados, obrigatórios, marca e cor — e fecha um briefing.md. Use quando o usuário quer planejar ou detalhar uma peça impressa; craft e adapt já o executam."
-allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/*) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
-license: "MIT (código e textos); fontes em RAIZ/assets/fonts sob SIL OFL 1.1"
+allowed-tools: "Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/rasterizar.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/preflight.py *) Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_deps.py) Bash(pdftoppm *) Bash(pdftocairo *) Bash(pdfimages *) Bash(pdffonts *) Bash(pdfinfo *)"
+license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LICENSE"
 ---
 
 # /grafica:grill [peça]
