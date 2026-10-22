@@ -7,12 +7,12 @@ Use o nome do arquivo sem extensão no kit (ex.: `"Anton-Regular"`).
 | Papel | Fontes | Uso |
 |---|---|---|
 | Impacto condensado | `Anton-Regular` · `BebasNeue-Regular` (só caixa-alta) · `BigShoulders-Bold` / `-Regular` | N1 e N2 de rua: preço, oferta, título. Muita letra em pouca largura |
-| Impacto largo/pesado | `ArchivoBlack-Regular` · `Montserrat-Black` · `Boldonse-Regular` · `EricaOne-Regular` | Palavra única gigante, selo, varejo popular |
+| Impacto largo/pesado | `ArchivoBlack-Regular` · `Boldonse-Regular` · `EricaOne-Regular` | Palavra única gigante, selo, varejo popular |
 | Slab (rústico, robusto) | `AlfaSlabOne-Regular` | Gastronomia rústica, oficina, construção, cervejaria |
 | Sans de apoio | `Montserrat-Regular` / `-Bold` · `WorkSans-Regular` / `-Bold` · `InstrumentSans-Regular` / `-Bold` · `Outfit-Regular` / `-Bold` · `BricolageGrotesque-Bold` | N3, contatos, cartões, textos corridos |
-| Serifa de display | `Gloock-Regular` · `YoungSerif-Regular` · `InstrumentSerif-Regular` / `-Italic` · `LibreBaskerville-Regular` | Nome de marca, sofisticado, gastronomia de autor |
-| Serifa de texto | `Lora-Regular` / `-Bold` / `-Italic` | Cardápio, folder, texto mais longo |
-| Script | `Pacifico-Regular` (casual) · `GreatVibes-Regular` (formal) | Só palavras curtas e GRANDES (≥ 2× a letra mínima). Nunca para informação |
+| Serifa de display | `Gloock-Regular` · `YoungSerif-Regular` · `InstrumentSerif-Regular` / `-Italic` | Nome de marca, sofisticado, gastronomia de autor |
+| Serifa de texto | `Lora-Regular` / `-Italic` | Cardápio, folder, texto mais longo |
+| Script | `Pacifico-Regular` (casual); para o formal, `InstrumentSerif-Italic` grande | Só palavras curtas e GRANDES (≥ 2× a letra mínima). Nunca para informação |
 
 `fontes_disponiveis()` lista também fontes do sistema. Fonte própria do cliente: `registrar_fonte("marca/Fonte.ttf")` — o kit recusa fonte variável (gere instância estática com `fontTools.varLib.instancer`) e avisa se faltar algum caractere (acentos!).
 
@@ -20,13 +20,13 @@ Use o nome do arquivo sem extensão no kit (ex.: `"Anton-Regular"`).
 
 | Contexto | Títulos | Apoio |
 |---|---|---|
-| Varejo / promoção / supermercado | Anton ou Montserrat-Black | Montserrat |
+| Varejo / promoção / supermercado | Anton ou ArchivoBlack | Montserrat |
 | Churrascaria / hamburgueria / bar | BigShoulders-Bold ou AlfaSlabOne | WorkSans ou InstrumentSans |
 | Gastronomia de autor / café | Gloock ou YoungSerif | InstrumentSans; InstrumentSerif-Italic para frases |
 | Saúde / estética / clínica | InstrumentSerif ou Gloock (nome) | Outfit ou WorkSans |
 | Oficina / construção / serviços técnicos | ArchivoBlack ou AlfaSlabOne | Montserrat-Bold |
 | Infantil / festa | Pacifico (palavra curta) + Outfit-Bold | Outfit |
-| Igreja / eventos formais | LibreBaskerville ou Gloock | Lora |
+| Igreja / eventos formais | Gloock ou YoungSerif | Lora |
 
 Máximo de **duas famílias** por peça (três estilos no total). Contraste vem de tamanho e peso, não de mais fontes.
 

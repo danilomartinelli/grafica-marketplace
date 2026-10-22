@@ -44,7 +44,7 @@ Exemplo: `/grafica:craft faixa 300x100 para a Oficina do Zé, troca de óleo por
 
 - **Kit Python** (`scripts/grafica_kit.py`): monta a peça em cm reais, com sangria, marcas de corte, texto alinhado pela tinta, preço de varejo ("de R$ X por"), fotos com fade e sombra, QR code, modo CMYK, e checagens automáticas (sobreposição, margem de segurança, letra mínima para a distância, contraste, DPI).
 - **Ferramentas**: `rasterizar.py` (DPI exato, versão Canva, prévia com guias, **simulação de distância**, **folha de daltonismo**), `preflight.py` (auditoria de qualquer PDF ou imagem), `check_deps.py`.
-- **29 fontes OFL** com acentos do português conferidos, e referências de formatos brasileiros, distância × DPI, produção gráfica, composição, tipografia, cor (marca, psicologia, contraste, acessibilidade) e obrigatórios legais (CDC, panfleto de rua, conselhos profissionais).
+- **24 fontes OFL** com acentos do português conferidos, e referências de formatos brasileiros, distância × DPI, produção gráfica, composição, tipografia, cor (marca, psicologia, contraste, acessibilidade) e obrigatórios legais (CDC, panfleto de rua, conselhos profissionais).
 
 ## Requisitos
 
