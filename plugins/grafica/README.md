@@ -55,6 +55,7 @@ Python 3 com `reportlab`, `Pillow`, `fonttools`, `numpy`, `pypdf` (`requirements
 - **Executa** só scripts Python locais da pasta `scripts/` e as ferramentas do poppler (`pdftoppm`, `pdftocairo`, `pdfimages`, `pdffonts`, `pdfinfo`). Os scripts não acessam a rede e não instalam nada; `check_deps.py` apenas lista o que falta.
 - **Baixa** fotos só quando você pede uma foto de banco (`/grafica:photo`): busca em bancos de licença livre (Unsplash, Pexels, Pixabay), confere a licença e salva numa pasta `fotos/` da sua pasta de trabalho.
 - **Envia** a peça para fora só no `/grafica:canva`, e só para a **sua** conta do Canva, pelo conector do Canva que você mesmo conectou — com a sua aprovação antes de salvar o design.
+- **Guarda** os dados da marca que você informar no `/grafica:teach` (nome, telefone, endereço, e-mail, redes) só no arquivo `.grafica.md` da sua pasta de trabalho; nada vai para servidor do plugin.
 - Nenhuma telemetria, nenhum servidor próprio, nenhuma credencial lida do seu ambiente.
 
 ## Licenças
