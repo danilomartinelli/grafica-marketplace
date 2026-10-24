@@ -122,7 +122,15 @@ ICC_CMYK_CANDIDATOS = [
 
 
 def perfil_cmyk():
-    """Caminho de um perfil ICC CMYK (FOGRA39 de preferência). Defina GRAFICA_ICC para usar o da gráfica."""
+    """Caminho de um perfil ICC CMYK, nesta ordem: variável GRAFICA_ICC; um .icc/.icm na pasta de trabalho
+    (ou em marca/), que é o jeito mais simples de usar o perfil mandado pela gráfica; FOGRA39 ou outro
+    perfil CMYK do sistema."""
+    if os.environ.get("GRAFICA_ICC") and os.path.exists(os.environ["GRAFICA_ICC"]):
+        return os.environ["GRAFICA_ICC"]
+    for pasta in (os.getcwd(), os.path.join(os.getcwd(), "marca")):
+        locais = sorted(glob.glob(os.path.join(pasta, "*.ic[cm]")) + glob.glob(os.path.join(pasta, "*.IC[CM]")))
+        if locais:
+            return locais[0]
     for p in ICC_CMYK_CANDIDATOS:
         if p and os.path.exists(p):
             return p

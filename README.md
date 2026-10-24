@@ -13,7 +13,7 @@ incluindo as dependências. Explique cada passo de forma simples e peça minha
 permissão antes de instalar qualquer coisa.
 ```
 
-**App do Claude (desktop ou web):** **Personalização → Plugins → Adicionar marketplace**, cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa tarefa do Cowork, digite `/grafica:setup`.
+**App do Claude:** em **Personalização → Plugins**, clique em **Adicionar → Adicionar marketplace** (*Add marketplace*), cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa **Nova tarefa** do Cowork, digite `/grafica:setup`.
 
 **Claude Code:**
 
@@ -21,9 +21,9 @@ permissão antes de instalar qualquer coisa.
 /plugin install grafica --marketplace danilomartinelli/grafica-marketplace
 ```
 
-Numa sessão nova, rode `/grafica:setup`.
+Depois, rode `/grafica:setup` (se o comando ainda não aparecer, abra uma sessão nova).
 
-Passo a passo completo, problemas comuns e um roteiro para assistentes de IA: **[INSTALAR.md](INSTALAR.md)**.
+Passo a passo completo, problemas comuns e notas para assistentes de IA: **[INSTALAR.md](INSTALAR.md)**.
 
 ## Usar
 

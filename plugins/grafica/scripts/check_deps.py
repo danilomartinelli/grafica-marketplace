@@ -60,47 +60,110 @@ def ambiente_gerenciado():
     return os.path.exists(os.path.join(sysconfig.get_path("stdlib"), "EXTERNALLY-MANAGED"))
 
 
-def comando_pip(pacotes):
-    py = f'"{sys.executable}"' if " " in sys.executable else sys.executable
+def python_cmd():
+    """Caminho deste Python, sempre entre aspas e com barras normais (funciona no bash, no Git Bash do Windows e no zsh)."""
+    return '"' + sys.executable.replace("\\", "/") + '"'
+
+
+def comando_pip():
     em_venv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
     extra = " --user --break-system-packages" if ambiente_gerenciado() and not em_venv else ""
-    alvo = f'-r "{REQ}"' if pacotes == "requirements" else " ".join(pacotes)
-    return f"{py} -m pip install{extra} {alvo}"
+    req = REQ.replace("\\", "/")
+    return f'{python_cmd()} -m pip install{extra} -r "{req}"'
+
+
+def minimos():
+    """Versões mínimas de requirements.txt: {"reportlab": (4, 0), ...}."""
+    m = {}
+    for linha in open(REQ, encoding="utf-8"):
+        linha = linha.strip()
+        if ">=" in linha and not linha.startswith("#"):
+            nome, ver = linha.split(">=", 1)
+            m[nome.strip().lower()] = versao(ver)
+    return m
+
+
+def versao(txt):
+    partes = []
+    for p in txt.strip().split("."):
+        num = "".join(ch for ch in p if ch.isdigit())
+        if not num:
+            break
+        partes.append(int(num))
+    return tuple(partes)
+
+
+def instalar_python(so):
+    return {
+        "macos": ("brew install python", "ou o instalador de https://www.python.org/downloads/ (mais simples sem Homebrew)"),
+        "windows": ("winget install -e --id Python.Python.3.12",
+                    "ou o instalador de https://www.python.org/downloads/ marcando \"Add python.exe to PATH\"; depois reabra o app"),
+        "debian": ("sudo apt-get install -y python3 python3-pip", "precisa de senha de administrador: a própria pessoa roda no terminal dela"),
+        "fedora": ("sudo dnf install -y python3 python3-pip", "precisa de senha de administrador: a própria pessoa roda no terminal dela"),
+    }.get(so, ("", "instale o Python 3.9 ou mais novo pelo gerenciador de pacotes do sistema"))
 
 
 def comando_poppler(so):
     return {
-        "macos": "brew install poppler   (precisa do Homebrew: https://brew.sh)",
-        "debian": "sudo apt-get install -y poppler-utils",
-        "fedora": "sudo dnf install -y poppler-utils",
-        "windows": "opcional no Windows — sem ele o kit usa o pypdfium2 e funciona igual",
+        "macos": "brew install poppler (precisa do Homebrew: https://brew.sh)",
+        "debian": "sudo apt-get install -y poppler-utils (a própria pessoa roda, com a senha dela)",
+        "fedora": "sudo dnf install -y poppler-utils (a própria pessoa roda, com a senha dela)",
+        "windows": "não precisa no Windows — sem ele o kit usa o pypdfium2 e funciona igual",
     }.get(so, "instale o pacote poppler (poppler-utils) do seu sistema")
 
 
 def conferir():
     so = sistema()
     r = {"sistema": so, "python": sys.executable, "python_versao": platform.python_version(),
-         "faltam_obrigatorios": [], "avisos": [], "comandos": [], "ok": True}
+         "faltam_obrigatorios": [], "desatualizados": [], "avisos": [], "comandos": [], "notas": [], "ok": True}
 
     if sys.version_info < (3, 9):
         r["ok"] = False
-        r["avisos"].append(f"Python {platform.python_version()} é antigo demais: instale o Python 3.10 ou mais novo")
-        r["comandos"].append({"macos": "brew install python   (ou o instalador de https://www.python.org/downloads/)",
-                              "windows": "winget install -e --id Python.Python.3.12   (ou o instalador de https://www.python.org/downloads/)",
-                              "debian": "sudo apt-get install -y python3 python3-pip"}.get(so, "instale o Python 3.10+"))
+        cmd, nota = instalar_python(so)
+        r["avisos"].append(f"Python {platform.python_version()} é antigo demais: o plugin precisa do 3.9 ou mais novo")
+        if cmd:
+            r["comandos"].append(cmd)
+        r["notas"].append(nota)
 
+    try:
+        from importlib.metadata import PackageNotFoundError, version as versao_instalada
+    except ImportError:  # Python < 3.8
+        versao_instalada, PackageNotFoundError = None, Exception
+    mins = minimos() if os.path.exists(REQ) else {}
     for mod, pkg in OBRIGATORIOS:
         try:
             importlib.import_module(mod)
         except ImportError:
             r["faltam_obrigatorios"].append(pkg)
+            continue
+        if versao_instalada and pkg.lower() in mins:
+            try:
+                v = versao_instalada(pkg)
+                if versao(v) < mins[pkg.lower()]:
+                    r["desatualizados"].append(f"{pkg} {v}")
+            except PackageNotFoundError:
+                pass
     tem_pip = importlib.util.find_spec("pip") is not None
 
-    if r["faltam_obrigatorios"]:
+    if r["faltam_obrigatorios"] or r["desatualizados"]:
         r["ok"] = False
         if not tem_pip:
-            r["comandos"].append(f"{sys.executable} -m ensurepip --upgrade   (o pip não está instalado neste Python)")
-        r["comandos"].append(comando_pip("requirements"))
+            em_venv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
+            if so in ("debian", "fedora") and not em_venv:
+                gerenciador = "apt-get" if so == "debian" else "dnf"
+                r["comandos"].append(f"sudo {gerenciador} install -y python3-pip")
+                r["notas"].append("o pip não está instalado neste Python; o comando acima precisa de senha de "
+                                  "administrador: a própria pessoa roda no terminal dela")
+            else:
+                r["comandos"].append(f"{python_cmd()} -m ensurepip --upgrade")
+                r["notas"].append("o pip não está instalado neste Python; o primeiro comando instala o pip")
+        r["comandos"].append(comando_pip())
+        if "--break-system-packages" in r["comandos"][-1]:
+            r["notas"].append("--user --break-system-packages: este Python é o do sistema e é protegido; com --user as "
+                              "bibliotecas vão só para a pasta do seu usuário, sem mexer no que o sistema usa")
+        if r["desatualizados"]:
+            r["notas"].append("bibliotecas antigas demais: " + ", ".join(r["desatualizados"])
+                              + " — o mesmo comando atualiza")
 
     r["poppler"] = all(shutil.which(b) for b in POPPLER) and os.environ.get("GRAFICA_MOTOR", "").lower() != "pdfium"
     r["motor_pdf"] = "poppler" if r["poppler"] else "pypdfium2"
@@ -121,7 +184,7 @@ def conferir():
     r["perfil_cmyk"] = icc
     if not icc:
         r["avisos"].append("sem perfil ICC CMYK (só importa se a gráfica exigir CMYK): peça o arquivo .icc à gráfica "
-                           "e defina a variável GRAFICA_ICC com o caminho dele")
+                           "e coloque-o na pasta de trabalho (ou defina a variável GRAFICA_ICC com o caminho dele)")
     return r
 
 
@@ -155,7 +218,9 @@ def main():
     print(f"Sistema: {r['sistema']} · Python {r['python_versao']} ({r['python']})")
     if r["faltam_obrigatorios"]:
         print("✗ Faltam pacotes Python:", ", ".join(r["faltam_obrigatorios"]))
-    else:
+    if r["desatualizados"]:
+        print("✗ Pacotes antigos demais:", ", ".join(r["desatualizados"]))
+    if not r["faltam_obrigatorios"] and not r["desatualizados"]:
         print("✓ Pacotes Python ok")
     if not r["faltam_obrigatorios"] or r["poppler"]:
         print(f"✓ Motor de PDF: {r['motor_pdf']}")
@@ -167,6 +232,8 @@ def main():
         print("\nPara resolver, rode (nesta ordem):")
         for c in r["comandos"]:
             print("  " + c)
+    for n in r["notas"]:
+        print("  obs.: " + n)
     if "teste" in r:
         for p in r["teste"]["passos"]:
             print(("✓ " if p["ok"] else "✗ ") + "teste: " + p["passo"])

@@ -6,7 +6,7 @@ Tudo parte de quatro perguntas — **de onde vão ver, qual o tamanho, em que ma
 
 ## Instalar
 
-**App do Claude (desktop ou web):** em **Personalização → Plugins**, escolha **Adicionar marketplace** (*Add marketplace*), cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa tarefa do Cowork, digite `/grafica:setup`.
+**App do Claude:** em **Personalização → Plugins**, clique em **Adicionar → Adicionar marketplace** (*Add marketplace*), cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa **Nova tarefa** do Cowork, digite `/grafica:setup`.
 
 **Claude Code:**
 
@@ -14,7 +14,7 @@ Tudo parte de quatro perguntas — **de onde vão ver, qual o tamanho, em que ma
 /plugin install grafica --marketplace danilomartinelli/grafica-marketplace
 ```
 
-(Versões antes da 2.1.275: `/plugin marketplace add danilomartinelli/grafica-marketplace` e depois `/plugin install grafica@grafica-marketplace`.) Numa sessão nova, rode `/grafica:setup`.
+(Versões antigas, sem `--marketplace`: `/plugin marketplace add danilomartinelli/grafica-marketplace` e depois `/plugin install grafica@grafica-marketplace`.) Depois, rode `/grafica:setup`.
 
 Passo a passo para quem não é técnico, e um roteiro para o próprio Claude seguir: [INSTALAR.md](https://github.com/danilomartinelli/grafica-marketplace/blob/main/INSTALAR.md).
 
@@ -46,7 +46,7 @@ Exemplo: `/grafica:craft faixa 300x100 para a Oficina do Zé, troca de óleo por
 
 ## Requisitos
 
-Python 3.9 ou mais novo com as bibliotecas de `requirements.txt` (reportlab, Pillow, fonttools, numpy, pypdf, pypdfium2). O `/grafica:setup` confere, mostra o que falta, instala com a sua permissão e testa gerando um cartão de exemplo. O poppler é opcional. Modo CMYK usa um perfil ICC (FOGRA39 se existir no sistema; defina `GRAFICA_ICC` para usar o da sua gráfica).
+Python 3.9 ou mais novo com as bibliotecas de `requirements.txt` (reportlab, Pillow, fonttools, numpy, pypdf, pypdfium2). O `/grafica:setup` confere, mostra o que falta, instala com a sua permissão e testa gerando um cartão de exemplo. O poppler é opcional. Modo CMYK usa um perfil ICC: ponha o `.icc` da gráfica na pasta de trabalho (ou defina `GRAFICA_ICC`); sem isso, o kit usa o FOGRA39 ou um perfil CMYK genérico do sistema.
 
 ## O que o plugin executa, baixa e envia
 
