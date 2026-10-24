@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Marketplace do plugin grafica — comunicação visual impressa em português.",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "plugins": [
     {
       "name": "grafica",
       "source": "./plugins/grafica",
       "description": "Peças gráficas impressas de comunicação visual — banner, faixa, lona, flyer, cartão de visita, cartaz, placa, adesivo, cardápio, outdoor — no tamanho real, com letra e DPI pela distância de leitura, cores da marca com contraste e acessibilidade, formato push para rua e arquivos prontos para a gráfica (PDF RGB/CMYK + imagem) e o Canva.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "category": "design",
       "keywords": [
         "impressao",
