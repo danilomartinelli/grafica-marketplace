@@ -191,7 +191,6 @@ def conferir():
 def teste_ponta_a_ponta(r):
     """Gera o cartão de exemplo numa pasta temporária, rasteriza a prévia e roda a pré-impressão."""
     pasta = tempfile.mkdtemp(prefix="grafica-teste-")
-    env = dict(os.environ, PYTHONPATH=AQUI + os.pathsep + os.environ.get("PYTHONPATH", ""))
     passos = [
         ("gerar o PDF do cartão de exemplo", [sys.executable, os.path.join(AQUI, "exemplo_cartao.py")]),
         ("rasterizar a prévia", [sys.executable, os.path.join(AQUI, "rasterizar.py"), "cartao.pdf", "--previa"]),
@@ -199,7 +198,7 @@ def teste_ponta_a_ponta(r):
     ]
     r["teste"] = {"pasta": pasta, "passos": []}
     for nome, cmd in passos:
-        p = subprocess.run(cmd, cwd=pasta, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        p = subprocess.run(cmd, cwd=pasta, capture_output=True, text=True, encoding="utf-8", errors="replace")
         ok = p.returncode == 0
         r["teste"]["passos"].append({"passo": nome, "ok": ok, "saida": (p.stdout + p.stderr).strip()[-600:]})
         if not ok:
