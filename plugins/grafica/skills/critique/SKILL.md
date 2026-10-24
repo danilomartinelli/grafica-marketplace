@@ -10,7 +10,7 @@ license: "MIT (código e textos); fontes empacotadas sob SIL OFL 1.1 — ver LIC
 **Pedido:** $ARGUMENTS
 **Uso:** `/grafica:critique [arquivo]`
 
-> **RAIZ** = pasta do plugin: `${CLAUDE_PLUGIN_ROOT}`. Se a variável não aparecer resolvida, use a pasta-base informada ao carregar esta skill e suba dois níveis; se você chegou aqui a partir de outra skill do plugin (ex.: craft → grill), use a mesma RAIZ dela. Antes de começar, leia `RAIZ/nucleo/principios.md` (princípios, ferramentas e padrão de entrega) e, uma vez por sessão, rode `python3 RAIZ/scripts/check_deps.py`.
+> **RAIZ** = pasta do plugin: `${CLAUDE_PLUGIN_ROOT}`. Se a variável não aparecer resolvida, use a pasta-base informada ao carregar esta skill e suba dois níveis; se você chegou aqui a partir de outra skill do plugin (ex.: craft → grill), use a mesma RAIZ dela. Antes de começar, leia `RAIZ/nucleo/principios.md` (princípios, ferramentas e padrão de entrega) e, uma vez por sessão, rode `python3 RAIZ/scripts/check_deps.py` (se faltar algo ou o Python tiver outro nome, siga `/grafica:setup` — `RAIZ/skills/setup/SKILL.md`).
 
 Avalia o design como quem vai passar na frente da peça. Funciona com peças feitas aqui (PDF + `.spec.json`) ou com arquivos do usuário (PDF, JPG, PNG, link do Canva lido via conector).
 

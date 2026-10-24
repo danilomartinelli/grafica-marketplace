@@ -6,25 +6,23 @@ Tudo parte de quatro perguntas — **de onde vão ver, qual o tamanho, em que ma
 
 ## Instalar
 
-Claude Code 2.1.275 ou mais novo:
+**App do Claude (desktop ou web):** em **Personalização → Plugins**, escolha **Adicionar marketplace** (*Add marketplace*), cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa tarefa do Cowork, digite `/grafica:setup`.
+
+**Claude Code:**
 
 ```
 /plugin install grafica --marketplace danilomartinelli/grafica-marketplace
 ```
 
-Versões anteriores:
+(Versões antes da 2.1.275: `/plugin marketplace add danilomartinelli/grafica-marketplace` e depois `/plugin install grafica@grafica-marketplace`.) Numa sessão nova, rode `/grafica:setup`.
 
-```
-/plugin marketplace add danilomartinelli/grafica-marketplace
-/plugin install grafica@grafica-marketplace
-```
-
-No app do Claude: abra o arquivo `dist/grafica.plugin` (na raiz do repositório) numa conversa e aceite a instalação.
+Passo a passo para quem não é técnico, e um roteiro para o próprio Claude seguir: [INSTALAR.md](https://github.com/danilomartinelli/grafica-marketplace/blob/main/INSTALAR.md).
 
 ## Comandos
 
 | Comando | O que faz |
 |---|---|
+| `/grafica:setup` | Prepara o computador na primeira vez: confere Python e bibliotecas, instala com a sua permissão e testa |
 | `/grafica:teach` | Salva a identidade da marca (`.grafica.md`) — cores com contraste aprovado, fontes, logo, contatos |
 | `/grafica:grill [peça]` | Entrevista o pedido: uma pergunta por vez, com recomendação, até fechar o briefing |
 | `/grafica:craft <tipo>` | Cria uma peça nova (passa pelo grill, escreve a direção de arte, constrói, confere, exporta) |
@@ -48,11 +46,12 @@ Exemplo: `/grafica:craft faixa 300x100 para a Oficina do Zé, troca de óleo por
 
 ## Requisitos
 
-Python 3 com `reportlab`, `Pillow`, `fonttools`, `numpy`, `pypdf` (`requirements.txt`) e o **poppler** (`pdftoppm`, `pdfimages`, `pdffonts`). Rode `python3 scripts/check_deps.py` para conferir. Modo CMYK usa um perfil ICC (FOGRA39 se existir no sistema; defina `GRAFICA_ICC` para usar o da sua gráfica).
+Python 3.9 ou mais novo com as bibliotecas de `requirements.txt` (reportlab, Pillow, fonttools, numpy, pypdf, pypdfium2). O `/grafica:setup` confere, mostra o que falta, instala com a sua permissão e testa gerando um cartão de exemplo. O poppler é opcional. Modo CMYK usa um perfil ICC (FOGRA39 se existir no sistema; defina `GRAFICA_ICC` para usar o da sua gráfica).
 
 ## O que o plugin executa, baixa e envia
 
-- **Executa** só scripts Python locais da pasta `scripts/` e as ferramentas do poppler (`pdftoppm`, `pdftocairo`, `pdfimages`, `pdffonts`, `pdfinfo`). Os scripts não acessam a rede e não instalam nada; `check_deps.py` apenas lista o que falta.
+- **Executa** só scripts Python locais da pasta `scripts/` e, se estiverem instaladas, as ferramentas do poppler (`pdftoppm`, `pdfimages`). Os scripts não acessam a rede e não instalam nada; `check_deps.py` apenas lista o que falta e o comando para resolver.
+- **Instala** bibliotecas Python só no `/grafica:setup`, só as de `requirements.txt`, vindas do PyPI pelo `pip`, e só depois de você autorizar.
 - **Baixa** fotos só quando você pede uma foto de banco (`/grafica:photo`): busca em bancos de licença livre (Unsplash, Pexels, Pixabay), confere a licença e salva numa pasta `fotos/` da sua pasta de trabalho.
 - **Envia** a peça para fora só no `/grafica:canva`, e só para a **sua** conta do Canva, pelo conector do Canva que você mesmo conectou — com a sua aprovação antes de salvar o design.
 - **Guarda** os dados da marca que você informar no `/grafica:teach` (nome, telefone, endereço, e-mail, redes) só no arquivo `.grafica.md` da sua pasta de trabalho; nada vai para servidor do plugin.

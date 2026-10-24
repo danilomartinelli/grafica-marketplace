@@ -1,7 +1,7 @@
 {
   "name": "grafica",
   "displayName": "Gráfica",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Peças gráficas impressas de comunicação visual — banner, faixa, lona, flyer, cartão de visita, cartaz, placa, adesivo, cardápio, outdoor — no tamanho real, com letra e DPI pela distância de leitura, cores da marca com contraste e acessibilidade, formato push para rua e arquivos prontos para a gráfica (PDF RGB/CMYK + imagem) e o Canva.",
   "author": {
     "name": "Danilo Martinelli",

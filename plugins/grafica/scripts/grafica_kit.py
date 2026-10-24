@@ -37,6 +37,7 @@ import glob
 import json
 import math
 import os
+import sys
 import tempfile
 from dataclasses import dataclass, field
 
@@ -54,6 +55,13 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as RLFont
 from reportlab.pdfgen import canvas as rl_canvas
+
+# Windows: saída para o terminal/pipe em UTF-8 (✓ ✗ × ã) sem quebrar no cp1252
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
 
 CM = 72 / 2.54
 FONTE_PADRAO = "WorkSans-Regular"
@@ -107,6 +115,9 @@ ICC_CMYK_CANDIDATOS = [
     "/usr/share/color/icc/ISOcoated_v2_eci.icc",
     "/usr/share/color/icc/ghostscript/default_cmyk.icc",
     "/usr/share/ghostscript/iccprofiles/default_cmyk.icc",
+    # macOS e Windows trazem perfis CMYK genéricos (não são FOGRA39, mas servem quando a gráfica não manda o dela)
+    "/System/Library/ColorSync/Profiles/Generic CMYK Profile.icc",
+    os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "spool", "drivers", "color", "RSWOP.icm"),
 ]
 
 
@@ -115,10 +126,13 @@ def perfil_cmyk():
     for p in ICC_CMYK_CANDIDATOS:
         if p and os.path.exists(p):
             return p
-    for p in glob.glob("/usr/share/**/*.icc", recursive=True):
-        n = os.path.basename(p).lower()
-        if any(k in n for k in ("fogra", "coated", "cmyk", "swop", "gracol")):
-            return p
+    pastas = ["/usr/share", "/Library/ColorSync/Profiles", os.path.expanduser("~/Library/ColorSync/Profiles"),
+              os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "spool", "drivers", "color")]
+    for pasta in pastas:
+        for p in glob.glob(os.path.join(pasta, "**", "*.ic[cm]"), recursive=True):
+            n = os.path.basename(p).lower()
+            if any(k in n for k in ("fogra", "coated", "cmyk", "swop", "gracol")):
+                return p
     return None
 
 

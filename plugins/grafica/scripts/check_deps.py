@@ -1,30 +1,182 @@
 #!/usr/bin/env python3
-"""Confere as dependências do kit e diz como instalar o que faltar. Rode uma vez por sessão.
+"""Confere se esta máquina tem o que o plugin grafica precisa e diz exatamente como instalar o que faltar.
 
-  python3 check_deps.py
+  python3 check_deps.py            # relatório legível
+  python3 check_deps.py --json     # o mesmo em JSON (para assistentes de IA)
+  python3 check_deps.py --teste    # além de conferir, gera um cartão de exemplo e confere o PDF de ponta a ponta
+
+Não instala nada sozinho: mostra o comando para você (ou o assistente, com a sua permissão) rodar.
+Sai com código 0 se o essencial estiver ok, 1 se faltar algo obrigatório.
 """
 import importlib
+import importlib.util
+import json
+import os
+import platform
 import shutil
+import subprocess
 import sys
+import tempfile
 
-PY = [("reportlab", "reportlab"), ("PIL", "Pillow"), ("fontTools", "fonttools"), ("numpy", "numpy"), ("pypdf", "pypdf")]
-BIN = ["pdftoppm", "pdftocairo", "pdfimages", "pdffonts", "pdfinfo"]
-
-faltam_py = []
-for mod, pkg in PY:
+for _s in (sys.stdout, sys.stderr):  # Windows: saída em UTF-8 sem quebrar no cp1252
     try:
-        importlib.import_module(mod)
-    except ImportError:
-        faltam_py.append(pkg)
-faltam_bin = [b for b in BIN if not shutil.which(b)]
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
 
-if not faltam_py and not faltam_bin:
-    print("dependências ok")
-    sys.exit(0)
-if faltam_py:
-    print("Faltam pacotes Python:", ", ".join(faltam_py))
-    print("  instale: pip install " + " ".join(faltam_py) + "   (em alguns sistemas: pip install --break-system-packages ...)")
-if faltam_bin:
-    print("Faltam ferramentas do poppler:", ", ".join(faltam_bin))
-    print("  Debian/Ubuntu: sudo apt-get install poppler-utils · macOS: brew install poppler · Windows: instale o poppler e ponha no PATH")
-sys.exit(1)
+AQUI = os.path.dirname(os.path.abspath(__file__))
+RAIZ = os.path.dirname(AQUI)
+REQ = os.path.join(RAIZ, "requirements.txt")
+
+# (módulo para importar, pacote no pip)
+OBRIGATORIOS = [("reportlab", "reportlab"), ("PIL", "Pillow"), ("fontTools", "fonttools"),
+                ("numpy", "numpy"), ("pypdf", "pypdf"), ("pypdfium2", "pypdfium2")]
+POPPLER = ["pdftoppm", "pdfimages"]
+
+
+def sistema():
+    s = platform.system()
+    if s == "Darwin":
+        return "macos"
+    if s == "Windows":
+        return "windows"
+    if s == "Linux":
+        try:
+            txt = open("/etc/os-release", encoding="utf-8").read().lower()
+        except OSError:
+            txt = ""
+        if any(k in txt for k in ("debian", "ubuntu", "mint")):
+            return "debian"
+        if any(k in txt for k in ("fedora", "rhel", "centos")):
+            return "fedora"
+        return "linux"
+    return s.lower()
+
+
+def ambiente_gerenciado():
+    """PEP 668: Python do sistema (Debian/Ubuntu, Homebrew) recusa `pip install` sem um sinalizador."""
+    import sysconfig
+
+    return os.path.exists(os.path.join(sysconfig.get_path("stdlib"), "EXTERNALLY-MANAGED"))
+
+
+def comando_pip(pacotes):
+    py = f'"{sys.executable}"' if " " in sys.executable else sys.executable
+    em_venv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
+    extra = " --user --break-system-packages" if ambiente_gerenciado() and not em_venv else ""
+    alvo = f'-r "{REQ}"' if pacotes == "requirements" else " ".join(pacotes)
+    return f"{py} -m pip install{extra} {alvo}"
+
+
+def comando_poppler(so):
+    return {
+        "macos": "brew install poppler   (precisa do Homebrew: https://brew.sh)",
+        "debian": "sudo apt-get install -y poppler-utils",
+        "fedora": "sudo dnf install -y poppler-utils",
+        "windows": "opcional no Windows — sem ele o kit usa o pypdfium2 e funciona igual",
+    }.get(so, "instale o pacote poppler (poppler-utils) do seu sistema")
+
+
+def conferir():
+    so = sistema()
+    r = {"sistema": so, "python": sys.executable, "python_versao": platform.python_version(),
+         "faltam_obrigatorios": [], "avisos": [], "comandos": [], "ok": True}
+
+    if sys.version_info < (3, 9):
+        r["ok"] = False
+        r["avisos"].append(f"Python {platform.python_version()} é antigo demais: instale o Python 3.10 ou mais novo")
+        r["comandos"].append({"macos": "brew install python   (ou o instalador de https://www.python.org/downloads/)",
+                              "windows": "winget install -e --id Python.Python.3.12   (ou o instalador de https://www.python.org/downloads/)",
+                              "debian": "sudo apt-get install -y python3 python3-pip"}.get(so, "instale o Python 3.10+"))
+
+    for mod, pkg in OBRIGATORIOS:
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            r["faltam_obrigatorios"].append(pkg)
+    tem_pip = importlib.util.find_spec("pip") is not None
+
+    if r["faltam_obrigatorios"]:
+        r["ok"] = False
+        if not tem_pip:
+            r["comandos"].append(f"{sys.executable} -m ensurepip --upgrade   (o pip não está instalado neste Python)")
+        r["comandos"].append(comando_pip("requirements"))
+
+    r["poppler"] = all(shutil.which(b) for b in POPPLER) and os.environ.get("GRAFICA_MOTOR", "").lower() != "pdfium"
+    r["motor_pdf"] = "poppler" if r["poppler"] else "pypdfium2"
+    if not r["poppler"]:
+        r["avisos"].append("poppler não encontrado (opcional): prévias e checagens usam o pypdfium2. "
+                           "Para instalar mesmo assim: " + comando_poppler(so))
+
+    r["perfil_cmyk"] = None
+    if r["faltam_obrigatorios"]:
+        return r
+    sys.path.insert(0, AQUI)
+    try:
+        from grafica_kit import perfil_cmyk
+
+        icc = perfil_cmyk()
+    except Exception:  # noqa: BLE001
+        icc = None
+    r["perfil_cmyk"] = icc
+    if not icc:
+        r["avisos"].append("sem perfil ICC CMYK (só importa se a gráfica exigir CMYK): peça o arquivo .icc à gráfica "
+                           "e defina a variável GRAFICA_ICC com o caminho dele")
+    return r
+
+
+def teste_ponta_a_ponta(r):
+    """Gera o cartão de exemplo numa pasta temporária, rasteriza a prévia e roda a pré-impressão."""
+    pasta = tempfile.mkdtemp(prefix="grafica-teste-")
+    env = dict(os.environ, PYTHONPATH=AQUI + os.pathsep + os.environ.get("PYTHONPATH", ""))
+    passos = [
+        ("gerar o PDF do cartão de exemplo", [sys.executable, os.path.join(AQUI, "exemplo_cartao.py")]),
+        ("rasterizar a prévia", [sys.executable, os.path.join(AQUI, "rasterizar.py"), "cartao.pdf", "--previa"]),
+        ("pré-impressão do PDF", [sys.executable, os.path.join(AQUI, "preflight.py"), "cartao.pdf"]),
+    ]
+    r["teste"] = {"pasta": pasta, "passos": []}
+    for nome, cmd in passos:
+        p = subprocess.run(cmd, cwd=pasta, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        ok = p.returncode == 0
+        r["teste"]["passos"].append({"passo": nome, "ok": ok, "saida": (p.stdout + p.stderr).strip()[-600:]})
+        if not ok:
+            r["ok"] = False
+            break
+
+
+def main():
+    r = conferir()
+    if "--teste" in sys.argv and not r["faltam_obrigatorios"]:
+        teste_ponta_a_ponta(r)
+    if "--json" in sys.argv:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        sys.exit(0 if r["ok"] else 1)
+
+    print(f"Sistema: {r['sistema']} · Python {r['python_versao']} ({r['python']})")
+    if r["faltam_obrigatorios"]:
+        print("✗ Faltam pacotes Python:", ", ".join(r["faltam_obrigatorios"]))
+    else:
+        print("✓ Pacotes Python ok")
+    if not r["faltam_obrigatorios"] or r["poppler"]:
+        print(f"✓ Motor de PDF: {r['motor_pdf']}")
+    if r["perfil_cmyk"]:
+        print(f"✓ Perfil CMYK: {r['perfil_cmyk']}")
+    for a in r["avisos"]:
+        print("! " + a)
+    if r["comandos"]:
+        print("\nPara resolver, rode (nesta ordem):")
+        for c in r["comandos"]:
+            print("  " + c)
+    if "teste" in r:
+        for p in r["teste"]["passos"]:
+            print(("✓ " if p["ok"] else "✗ ") + "teste: " + p["passo"])
+            if not p["ok"]:
+                print("    " + p["saida"].replace("\n", "\n    "))
+        if r["ok"]:
+            print(f"  (arquivos do teste em {r['teste']['pasta']})")
+    print("\n" + ("dependências ok" if r["ok"] else "FALTA ALGO — veja acima"))
+    sys.exit(0 if r["ok"] else 1)
+
+
+if __name__ == "__main__":
+    main()

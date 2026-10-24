@@ -10,6 +10,7 @@ Peça impressa é um objeto físico, visto **a uma distância**, por alguém **e
 
 | Comando | Para quê |
 |---|---|
+| `/grafica:setup` | Preparar a máquina/sessão: confere Python e bibliotecas, instala com permissão e testa |
 | `/grafica:teach` | Salvar a identidade da marca (nome, logo, cores, fontes, contatos) para todas as peças |
 | `/grafica:grill [peça]` | Entrevistar o pedido até não sobrar dúvida (uma pergunta por vez, com recomendação) e fechar o briefing |
 | `/grafica:craft <tipo>` | Criar uma peça nova (banner, faixa, cartao, flyer, cartaz, adesivo, placa, cardapio…) — começa pelo grill |
@@ -44,7 +45,7 @@ Procure `.grafica.md` na pasta de trabalho (e nas pastas conectadas do usuário)
 
 ## Ferramentas
 
-Scripts em `RAIZ/scripts/` (Python 3 com reportlab, Pillow, fontTools, numpy, pypdf; poppler para `pdftoppm`, `pdfimages`, `pdffonts`):
+Scripts em `RAIZ/scripts/` (Python 3.9+ com reportlab, Pillow, fontTools, numpy, pypdf e pypdfium2; o poppler é opcional — com ele, prévias e checagens usam `pdftoppm`/`pdfimages`, sem ele usam o pypdfium2):
 
 - `grafica_kit.py` — biblioteca para montar a peça como **PDF vetorial no tamanho final** em cm: `Peca(...)`, `fundo`, gradientes, formas, `texto` (alinhamento pela tinta real, `cap=` em cm ou `pt=`), `paragrafo`, `preco` (R$ pequeno, inteiro gigante, centavos sobrescritos, "de R$ X por"), `foto` (cover, foco, opacidade, fades, sombra atrás de textos), `imagem` (logo), `qrcode`, `nova_pagina` (verso), `Peca(..., cores="cmyk")` (conversão pelo perfil ICC). Cor: `contraste`, `ajustar_contraste`, `relatorio_cores`, `simular_cor`. Texto gigante vira curvas sozinho (com camada pesquisável). `salvar()` grava o PDF + `<nome>.spec.json` e checa sobreposição, margem de segurança, letra mínima para a distância, contraste e DPI das fotos. Leia a docstring do módulo antes de usar.
 - `exemplo_banner.py` (lona a 15 m com foto, fade e preço) e `exemplo_cartao.py` (cartão frente e verso com marcas de corte e QR) — copie para a pasta de trabalho como ponto de partida; não escreva do zero. A cópia roda com `PYTHONPATH=RAIZ/scripts python3 build_<peca>.py`.
@@ -53,7 +54,7 @@ Scripts em `RAIZ/scripts/` (Python 3 com reportlab, Pillow, fontTools, numpy, py
 
 As fontes empacotadas estão em `RAIZ/assets/fonts/` (com licenças) e o mapa de quando usar cada uma em `RAIZ/references/tipografia.md`. Fonte da marca do cliente: `registrar_fonte(caminho)`.
 
-Rode os scripts com `python3 RAIZ/scripts/<script>.py` (dependências: `RAIZ/requirements.txt` + poppler; confira com `check_deps.py`). Trabalhe na pasta de trabalho do usuário, nunca dentro da pasta do plugin.
+Rode os scripts com `python3 RAIZ/scripts/<script>.py` (no Windows o comando pode ser `py -3` ou `python`). Dependências em `RAIZ/requirements.txt`; se `check_deps.py` acusar falta, siga `/grafica:setup` antes de continuar. Trabalhe na pasta de trabalho do usuário, nunca dentro da pasta do plugin.
 
 ## Referências (`RAIZ/references/`, leia quando o comando pedir)
 

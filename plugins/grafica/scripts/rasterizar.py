@@ -13,20 +13,21 @@ Exemplos
 
 Por padrão recorta na linha de corte (TrimBox). --com-sangria inclui a sangria.
 Formato automático: JPEG se o PDF tiver fotos (PNG com foto fica enorme), PNG se for só vetor.
+Renderiza com o poppler (pdftoppm) se estiver instalado; senão com o pypdfium2 (só pip).
 """
 import argparse
 import json
 import math
 import os
-import struct
-import subprocess
 import sys
 
 from pypdf import PdfReader
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from motor_pdf import renderizar, tem_imagens  # noqa: E402  (poppler se houver; senão pypdfium2)
+
 CANVA_MAX_PX = 100_000_000
 CANVA_MAX_BYTES = 25 * 1024 * 1024
-
 
 
 def _fonte_rotulo(tamanho):
@@ -48,42 +49,6 @@ def caixas(pdf, pagina):
     trim = [float(v) for v in (pg.trimbox if "/TrimBox" in pg else pg.mediabox)]
     bleed = [float(v) for v in (pg.bleedbox if "/BleedBox" in pg else pg.mediabox)]
     return media, trim, bleed
-
-
-def tem_imagens(pdf):
-    try:
-        out = subprocess.run(["pdfimages", "-list", pdf], capture_output=True, text=True, check=True).stdout
-        return any(l.split()[2:3] == ["image"] for l in out.splitlines()[2:] if l.strip())
-    except Exception:
-        return True
-
-
-def ajustar_dpi_jpeg(caminho, dpi):
-    b = bytearray(open(caminho, "rb").read())
-    if b[0:4] == b"\xff\xd8\xff\xe0" and b[6:11] == b"JFIF\x00":
-        b[13] = 1
-        b[14:16] = struct.pack(">H", int(round(dpi)))
-        b[16:18] = struct.pack(">H", int(round(dpi)))
-        open(caminho, "wb").write(b)
-
-
-def renderizar(pdf, pagina, regiao, media, dpi, formato, saida_base, qualidade):
-    x0, y0, x1, y1 = regiao
-    W = round((x1 - x0) / 72 * dpi)
-    H = round((y1 - y0) / 72 * dpi)
-    X = round((x0 - media[0]) / 72 * dpi)
-    Y = round((media[3] - y1) / 72 * dpi)
-    cmd = ["pdftoppm", "-r", f"{dpi}", "-f", str(pagina), "-l", str(pagina), "-x", str(X), "-y", str(Y),
-           "-W", str(W), "-H", str(H), "-singlefile", "-aa", "yes", "-aaVector", "yes"]
-    if formato == "jpg":
-        cmd += ["-jpeg", "-jpegopt", f"quality={qualidade},optimize=y"]
-    else:
-        cmd += ["-png"]
-    subprocess.run(cmd + [pdf, saida_base], check=True)
-    caminho = saida_base + (".jpg" if formato == "jpg" else ".png")
-    if formato == "jpg":
-        ajustar_dpi_jpeg(caminho, dpi)
-    return caminho, W, H
 
 
 def desenhar_guias(png, regiao_px_por_cm, spec, com_sangria):
@@ -126,7 +91,7 @@ CVD = {
 def folha_daltonismo(a, trim, media, w_in):
     """Original + 3 tipos de daltonismo (Machado et al. 2009) + tons de cinza, numa folha só."""
     import numpy as np
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw
 
     base = (a.pdf[:-4] if a.pdf.lower().endswith(".pdf") else a.pdf) + "-daltonismo" + (f"-p{a.pagina}" if a.pagina > 1 else "")
     caminho, W, H = renderizar(a.pdf, a.pagina, trim, media, 900 / w_in, "png", base + "-tmp", 90)

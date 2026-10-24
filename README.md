@@ -1,18 +1,30 @@
 # grafica-marketplace
 
-Marketplace de plugins para o Claude com o plugin **grafica** — criação de peças impressas de comunicação visual (banner, faixa, flyer, cartão de visita, cartaz, placa…) em português, prontas para a gráfica.
+Marketplace de plugins para o Claude com o plugin **Gráfica**: criação de peças impressas de comunicação visual (banner, faixa, flyer, cartão de visita, cartaz, placa…) em português, prontas para a gráfica.
 
-## Instalar no Claude Code
+## Instalar
+
+**Jeito mais fácil:** cole isto no Claude.
 
 ```
-/plugin marketplace add danilomartinelli/grafica-marketplace
-/plugin install grafica@grafica-marketplace
+Quero instalar o plugin Gráfica: https://github.com/danilomartinelli/grafica-marketplace
+Leia o arquivo INSTALAR.md desse repositório e me guie na instalação completa,
+incluindo as dependências. Explique cada passo de forma simples e peça minha
+permissão antes de instalar qualquer coisa.
 ```
 
-(No Claude Code 2.1.275+ também funciona em um passo: `/plugin install grafica --marketplace danilomartinelli/grafica-marketplace`.)
+**App do Claude (desktop ou web):** **Personalização → Plugins → Adicionar marketplace**, cole `danilomartinelli/grafica-marketplace` e instale **Gráfica**. Depois, numa tarefa do Cowork, digite `/grafica:setup`.
 
-Depois: `/grafica:craft banner ...`, `/grafica:grill`, `/grafica:audit arquivo.pdf` etc. Detalhes em [`plugins/grafica/README.md`](plugins/grafica/README.md).
+**Claude Code:**
 
-## Instalar no app do Claude
+```
+/plugin install grafica --marketplace danilomartinelli/grafica-marketplace
+```
 
-Use o arquivo `dist/grafica.plugin` (gerado a partir de `plugins/grafica/`): abra-o numa conversa e aceite a instalação, ou, em organizações, peça ao administrador para adicioná-lo ao catálogo de plugins da organização.
+Numa sessão nova, rode `/grafica:setup`.
+
+Passo a passo completo, problemas comuns e um roteiro para assistentes de IA: **[INSTALAR.md](INSTALAR.md)**.
+
+## Usar
+
+`/grafica:teach` cadastra a marca; `/grafica:craft banner ...` cria uma peça; `/grafica:audit arquivo.pdf` confere um arquivo antes da gráfica. Todos os comandos em [`plugins/grafica/README.md`](plugins/grafica/README.md).

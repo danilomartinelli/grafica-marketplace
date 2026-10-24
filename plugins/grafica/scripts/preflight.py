@@ -15,11 +15,11 @@ import argparse
 import json
 import math
 import os
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from grafica_kit import MATERIAIS, faixa_distancia, letra_impacto_cm, letra_minima_cm  # noqa: E402
+from motor_pdf import listar_fontes, listar_imagens  # noqa: E402
 
 PT_CM = 2.54 / 72
 OK, AV, ER = "✓", "!", "✗"
@@ -61,14 +61,8 @@ def checar_pdf(path, esp, out):
 
     # fontes
     try:
-        txt = subprocess.run(["pdffonts", path], capture_output=True, text=True, check=True).stdout.splitlines()
-        # colunas pela linha de traços: name | type | encoding | emb | sub | uni | object ID
-        spans, pos = [], 0
-        for seg in txt[1].split(" "):
-            spans.append((pos, pos + len(seg)))
-            pos += len(seg) + 1
-        emb = [(l[spans[0][0]:spans[0][1]].strip(), l[spans[3][0]:spans[3][1]].strip()) for l in txt[2:] if l.strip()]
-        nao = [nm for nm, e in emb if e != "yes"]
+        emb = listar_fontes(path)
+        nao = [nm for nm, e in emb if not e]
         linha(OK if not nao else ER, f"{len(emb)} fonte(s), " + ("todas incorporadas" if not nao else f"NÃO incorporadas: {', '.join(nao)}"), out)
     except Exception as e:  # noqa: BLE001
         linha(AV, f"não consegui listar fontes ({e})", out)
@@ -77,12 +71,7 @@ def checar_pdf(path, esp, out):
     dist = esp.get("distancia")
     fx = faixa_distancia(dist) if dist else None
     try:
-        il = subprocess.run(["pdfimages", "-list", path], capture_output=True, text=True, check=True).stdout.splitlines()[2:]
-        imgs = []
-        for l in il:
-            p = l.split()
-            if len(p) >= 14 and p[2] == "image":
-                imgs.append({"pag": int(p[0]), "w": int(p[3]), "h": int(p[4]), "cor": p[5], "ppi": min(int(p[12]), int(p[13]))})
+        imgs = listar_imagens(path)
         if not imgs:
             linha(OK, "sem imagens (100% vetorial)", out)
         for im in imgs:
